@@ -1,6 +1,9 @@
 const taskContainer = document.querySelector(".task_container");
 console.log(taskContainer);
 
+const globalStorage = []; //creating array
+
+// html code for input of card
 const newCard = (taskData) => ` 
     <div class="col-md-6 col-lg-4 id=${taskData.id}">
     <div class="card text-center">
@@ -21,6 +24,29 @@ const newCard = (taskData) => `
   </div>
   `;
 
+// loading cards not to deleted after refresh also for that this approach
+
+const loadCardData = () => {
+    // local storage to get the data
+    
+    const getCardData = localStorage.getItem("Taskie");
+
+    // converting from string to normal data
+
+    const {cards} = JSON.parse(getCardData);
+
+    // loop over these array of task object to create HTML card ,
+
+    cards.map((cardObject) => {
+        // inject it to DOM
+        taskContainer.insertAdjacentHTML("beforeend" , newCard(cardObject));
+        // update to global storage
+        globalStorage.push(cardObject);
+    })
+
+}
+
+// inputing data and making changes (or adding card) on clicking to save change
 const saveChanges = () => {
     const taskData = {
         id: `${Date.now()}`,  //unique number for card id
@@ -31,7 +57,10 @@ const saveChanges = () => {
     };
     console.log(taskData);
 
-    
 
   taskContainer.insertAdjacentHTML("beforeend" , newCard(taskData));
+
+  globalStorage.push(taskData); //data pushing into array
+
+  localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage})); //data storing in local storage
 };
