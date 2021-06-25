@@ -1,15 +1,16 @@
 const taskContainer = document.querySelector(".task_container");
-console.log(taskContainer);
+//console.log(taskContainer);
 
-const globalStorage = []; //creating array
+let globalStorage = []; //creating array
 
 // html code for input of card
 const newCard = (taskData) => ` 
-    <div class="col-md-6 col-lg-4 id=${taskData.id}">
+    <div class="col-md-6 col-lg-4 mt-3" id=${taskData.id}>
     <div class="card text-center">
       <div class="card-header d-flex justify-content-end gap-2">
         <button type="button" class="btn btn-outline-success" ><i class="fas fa-edit"></i></button>
-        <button type="button" class="btn btn-outline-danger"><i class="fas fa-trash"></i></i></button>
+        <button type="button" class="btn btn-outline-danger" id=${taskData.id} onclick="deleteCard.apply(this, arguments)">
+        <i class="fas fa-trash" id=${taskData.id} onclick="deleteCard.apply(this, arguments)"></i></button>
       </div>
       <img src="${taskData.imageUrl}" class="card-img-top" alt="...">
       <div class="card-body">
@@ -30,6 +31,7 @@ const loadCardData = () => {
     // local storage to get the data
     
     const getCardData = localStorage.getItem("Taskie");
+    if(!getCardData) return;
 
     // converting from string to normal data
 
@@ -42,9 +44,13 @@ const loadCardData = () => {
         taskContainer.insertAdjacentHTML("beforeend" , newCard(cardObject));
         // update to global storage
         globalStorage.push(cardObject);
-    })
+    });
 
-}
+};
+
+// update local storage
+
+
 
 // inputing data and making changes (or adding card) on clicking to save change
 const saveChanges = () => {
@@ -55,7 +61,7 @@ const saveChanges = () => {
         taskType: document.getElementById("tasktype").value,
         taskDescription: document.getElementById("taskdescription").value,
     };
-    console.log(taskData);
+    //console.log(taskData);
 
 
   taskContainer.insertAdjacentHTML("beforeend" , newCard(taskData));
@@ -63,4 +69,27 @@ const saveChanges = () => {
   globalStorage.push(taskData); //data pushing into array
 
   localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage})); //data storing in local storage
+};
+
+// Deleting card
+
+const deleteCard = (event) => {
+  // id
+  event = window.event;
+  
+  const targetID = event.target.id;
+
+  const tagname = event.target.tagName;
+
+  globalStorage = globalStorage.filter((cardObject) => cardObject.id != targetID);
+
+  localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage}));
+
+  if(tagname == "BUTTON"){
+    return taskContainer.removeChild(event.target.parentNode.parentNode.parentNode);
+  }else{
+    return taskContainer.removeChild(event.target.parentNode.parentNode.parentNode.parentNode);
+  }
+  
+  
 };
