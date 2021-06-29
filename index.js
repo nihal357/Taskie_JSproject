@@ -5,10 +5,10 @@ let globalStorage = []; //creating array
 
 // html code for input of card
 const newCard = (taskData) => ` 
-    <div class="col-md-6 col-lg-4 mt-3" id=${taskData.id}>
+    <div class="col-md-6 col-lg-4 mt-2" id=${taskData.id}>
     <div class="card text-center">
       <div class="card-header d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-success" ><i class="fas fa-edit"></i></button>
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal1" id=${taskData.id} onclick="editCard.apply(this, arguments)"><i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#exampleModal1" id=${taskData.id} onclick="editCard.apply(this, arguments)"></i></button>
         <button type="button" class="btn btn-outline-danger" id=${taskData.id} onclick="deleteCard.apply(this, arguments)">
         <i class="fas fa-trash" id=${taskData.id} onclick="deleteCard.apply(this, arguments)"></i></button>
       </div>
@@ -49,11 +49,10 @@ const loadCardData = () => {
 };
 
 // update local storage
+updateLocalStorage = () => localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage}));
 
-
-
-// inputing data and making changes (or adding card) on clicking to save change
-const saveChanges = () => {
+// inputing data  (or adding card) on clicking to save 
+const saveButton = () => {
     const taskData = {
         id: `${Date.now()}`,  //unique number for card id
         imageUrl: document.getElementById("imageurl").value,
@@ -68,8 +67,9 @@ const saveChanges = () => {
 
   globalStorage.push(taskData); //data pushing into array
 
-  localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage})); //data storing in local storage
+  updateLocalStorage(); //data storing in local storage
 };
+
 
 // Deleting card
 
@@ -83,7 +83,7 @@ const deleteCard = (event) => {
 
   globalStorage = globalStorage.filter((cardObject) => cardObject.id != targetID);
 
-  localStorage.setItem("Taskie", JSON.stringify({cards:globalStorage}));
+  updateLocalStorage();
 
   if(tagname == "BUTTON"){
     return taskContainer.removeChild(event.target.parentNode.parentNode.parentNode);
@@ -91,5 +91,36 @@ const deleteCard = (event) => {
     return taskContainer.removeChild(event.target.parentNode.parentNode.parentNode.parentNode);
   }
   
+  
+};
+
+
+// Edit Card
+
+const editCard = (event) => {
+  event = window.event;
+  
+  const targetID = event.target.id;
+
+  const tagname = event.target.tagName;
+
+  let parentElement;
+
+  if(tagname == "BUTTON"){
+    parentElement = event.target.parentNode.parentNode;
+  }
+  else{
+    parentElement = event.target.parentNode.parentNode.parentNode;
+  }
+
+  let taskTitle = parentElement.childNodes[5].childNodes[1];
+  let taskDescription = parentElement.childNodes[5].childNodes[3];
+  let taskType = parentElement.childNodes[5].childNodes[5];
+  let submitButton = parentElement.childNodes[7].childNodes[1];
+
+  taskTitle.setAttribute("contenteditable", "true");
+  taskDescription.setAttribute("contenteditable", "true");
+  taskType.setAttribute("contenteditable", "true");
+  submitButton.innerHTML = "Save Changes";
   
 };
